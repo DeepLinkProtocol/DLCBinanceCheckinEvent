@@ -1,0 +1,160 @@
+definitions:
+  controllers.SignInRequest:
+    properties:
+      data:
+        example: hello
+        type: string
+      signature:
+        example: 0x4ae2890fa2206807b6d25039b9b992cdd866989e9b6cc58d5a672b0d1c7e34f0760fe83744acd2595e89bab14fe818699231c302185047edc67582041b0c30e401
+        type: string
+      walletAddress:
+        example: 0x5de8477A8A47e7F2c5cE05ad4532861a0AaAc909
+        type: string
+    required:
+    - data
+    - signature
+    - walletAddress
+    type: object
+  utils.Response:
+    properties:
+      code:
+        type: string
+      data: {}
+      message:
+        type: string
+    type: object
+  utils.SignCountData:
+    properties:
+      count:
+        type: integer
+    type: object
+  utils.TaskCompletionData:
+    properties:
+      sign:
+        type: boolean
+    type: object
+info:
+  contact: {}
+paths:
+  /v1/task/completion:
+    get:
+      consumes:
+      - application/json
+      description: This endpoint checks if the user has completed the sign-in task
+        based on the wallet address.
+      parameters:
+      - description: User Wallet Address
+        in: query
+        name: walletAddress
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Task completion status code="000000" message="success
+          schema:
+            allOf:
+            - $ref: '#/definitions/utils.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/utils.TaskCompletionData'
+              type: object
+        "400":
+          description: Invalid Argument code="000006
+          schema:
+            $ref: '#/definitions/utils.Response'
+        "500":
+          description: System Error code="000002" message="system busy
+          schema:
+            $ref: '#/definitions/utils.Response'
+      summary: Get Task Completion Status
+      tags:
+      - task completion
+  /v1/task/signin:
+    get:
+      consumes:
+      - application/json
+      description: Allows a user to sign in within a specific activity period. Signin
+        count will be incremented and stored in Redis.
+      parameters:
+      - description: User Wallet Address
+        in: query
+        name: walletAddress
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Sign Count(1 times per day) code="000000" message="success
+          schema:
+            allOf:
+            - $ref: '#/definitions/utils.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/utils.SignCountData'
+              type: object
+        "400":
+          description: Invalid Argument code="000006" message="invalid argument
+          schema:
+            $ref: '#/definitions/utils.Response'
+        "500":
+          description: System Error code="000002" message="system busy
+          schema:
+            $ref: '#/definitions/utils.Response'
+      summary: Get signin count
+      tags:
+      - SignCount
+    post:
+      consumes:
+      - application/json
+      description: Allows a user to sign in within a specific activity period. Signin
+        count will be incremented and stored in Redis.
+      parameters:
+      - description: 'walletAddress: wallet address, signature: signature, data: used
+          for make signature'
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/controllers.SignInRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: code="000000" message="success
+          schema:
+            $ref: '#/definitions/utils.Response'
+        "400":
+          description: Invalid Argument code="000006" message="invalid argument
+          schema:
+            $ref: '#/definitions/utils.Response'
+        "500":
+          description: System Error code="000002" message="system busy
+          schema:
+            $ref: '#/definitions/utils.Response'
+      summary: User Signin
+      tags:
+      - SignIn
+  /v1/time:
+    get:
+      consumes:
+      - application/json
+      description: This endpoint returns the current server time in milliseconds since
+        Unix epoch.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Current server time
+          schema:
+            $ref: '#/definitions/utils.Response'
+        "500":
+          description: System busy
+          schema:
+            $ref: '#/definitions/utils.Response'
+      summary: Get Server Time
+      tags:
+      - server time
+swagger: "2.0"
