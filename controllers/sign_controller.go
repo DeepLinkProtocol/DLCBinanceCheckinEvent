@@ -43,11 +43,11 @@ func SignInHandler(c *gin.Context) {
 	signature := req.Signature
 	data := req.Data
 
-	location, _ := time.LoadLocation("Asia/Shanghai")
+	location, _ := time.LoadLocation("UTC")
 	currentTime := time.Now().In(location)
 
-	activityStartTime := time.Date(2024, 12, 10, 16, 0, 0, 0, location)
-	activityEndTime := time.Date(2025, 1, 7, 16, 0, 0, 0, location)
+	activityStartTime := time.Date(2024, 12, 24, 0, 0, 0, 0, location)
+	activityEndTime := time.Date(2025, 1, 6, 23, 59, 59, 0, location)
 
 	if currentTime.Before(activityStartTime) || currentTime.After(activityEndTime) {
 		utils.JSONResponse(c, http.StatusBadRequest, "000006", "invalid argument: sign-in is not allowed outside of activity time", nil)
